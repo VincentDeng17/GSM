@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quanteng.gsmp.reporsity.mapper.ChannelMapper">
+
+    <resultMap id="ChannelMap" type="Channel">
+        <id property="channelId" column="channel_id"/>
+        <result property="channelName" column="channel_name"/>
+        <result property="level" column="level"/>
+        <result property="remarks" column="remarks"/>
+        <result property="notifyUrl" column="notify_url"/>
+        <result property="callbackParams" column="callback_params"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="add" parameterType="Channel">
+        INSERT INTO T_CHANNEL (channel_id,channel_name,level,remarks,notify_url,callback_params,create_time)
+        VALUES (#{channelId},#{channelName},#{level},#{remarks},#{notifyUrl},#{callbackParams},DATE_FORMAT(NOW(),'%Y-%m-%d %T'))
+    </insert>
+
+    <update id="modify" parameterType="Channel">
+        UPDATE T_CHANNEL
+        <set>
+            <if test="channelName != null">
+                channel_name = #{channelName},
+            </if>
+            <if test="level != null">
+                level = #{level},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks},
+            </if>
+            <if test="notifyUrl != null">
+                notify_url = #{notifyUrl},
+            </if>
+            <if test="callbackParams != null">
+                callback_params = #{callbackParams},
+            </if>
+            create_time = DATE_FORMAT(NOW(),'%Y-%m-%d %T')
+        </set>
+        WHERE channel_id = #{channelId}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE  FROM  T_CHANNEL WHERE channel_id = #{channelId}
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="ChannelMap">
+        SELECT channel_id,channel_name,level,remarks,notify_url,callback_params,create_time
+        FROM T_CHANNEL
+        WHERE 1 = 1
+        <if test="channelId != null">
+            AND channel_id = #{channelId}
+        </if>
+        <if test="channelName != null">
+            AND channel_name = #{channelName}
+        </if>
+        <if test="level != null">
+            AND level = #{level}
+        </if>
+        <if test="remarks != null">
+            AND remarks LIKE concat('%',#{remarks},'%')
+        </if>
+        <if test="startTime != null">
+            AND create_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND create_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        ORDER BY level ASC,channel_id DESC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="queryById" parameterType="String" resultMap="ChannelMap">
+        SELECT channel_id,channel_name,level,remarks,notify_url,callback_params,create_time
+        FROM T_CHANNEL
+        WHERE 1 = 1
+        AND channel_id = #{channelId}
+    </select>
+
+    <select id="count" parameterType="map" resultType="int">
+        SELECT COUNT(*) AS total
+        FROM T_CHANNEL
+        WHERE 1 = 1
+        <if test="channelId != null">
+            AND channel_id = #{channelId}
+        </if>
+        <if test="channelName != null">
+            AND channel_name = #{channelName}
+        </if>
+        <if test="level != null">
+            AND level = #{level}
+        </if>
+        <if test="remarks != null">
+            AND remarks LIKE concat('%',#{remarks},'%')
+        </if>
+        <if test="startTime != null">
+            AND create_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND create_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        ORDER BY level ASC,channel_id DESC
+    </select>
+
+
+</mapper>

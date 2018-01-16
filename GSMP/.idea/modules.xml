@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/gsmp.iml" filepath="$PROJECT_DIR$/gsmp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gsmp-commom/gsmp-commom.iml" filepath="$PROJECT_DIR$/gsmp-commom/gsmp-commom.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gsmp-database/gsmp-database.iml" filepath="$PROJECT_DIR$/gsmp-database/gsmp-database.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gsmp-provider/gsmp-provider.iml" filepath="$PROJECT_DIR$/gsmp-provider/gsmp-provider.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gsmp-resource/gsmp-resource.iml" filepath="$PROJECT_DIR$/gsmp-resource/gsmp-resource.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gsmp-web/gsmp-web.iml" filepath="$PROJECT_DIR$/gsmp-web/gsmp-web.iml" />
+    </modules>
+  </component>
+</project>

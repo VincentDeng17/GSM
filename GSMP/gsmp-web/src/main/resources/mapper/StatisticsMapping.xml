@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quanteng.gsmp.reporsity.mapper.StatisticsMapper">
+
+    <resultMap id="StatisticsMap" type="Statistics">
+        <id property="dimension" column="dimension"/>
+        <result property="appName" column="app_name"/>
+        <result property="subChannel" column="sub_channel"/>
+        <result property="countryId" column="country_id"/>
+        <result property="clicks" column="clicks"/>
+        <result property="conversions" column="conversions"/>
+        <result property="rate" column="rate"/>
+        <result property="cost" column="cost"/>
+    </resultMap>
+
+    <insert id="add" parameterType="Statistics">
+        INSERT INTO T_STATISTICS (dimension,app_name,sub_channel,country_id,clicks,conversions,rate,cost)
+        VALUES (#{dimension},#{appName},#{subChannel},#{countryId},#{clicks},#{conversions},#{rate},#{cost})
+    </insert>
+
+    <update id="modify" parameterType="Statistics">
+        UPDATE T_STATISTICS
+        <set>
+            <if test="clicks != null">
+                clicks = #{clicks},
+            </if>
+            <if test="conversions != null">
+                conversions = #{conversions},
+            </if>
+            <if test="rate != null">
+                rate = #{rate},
+            </if>
+            <if test="cost != null">
+                cost = #{cost},
+            </if>
+        </set>
+        WHERE dimension = #{dimension}
+        AND app_name = #{appName}
+        AND sub_channel = #{subChannel}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE  FROM  T_STATISTICS
+        WHERE dimension = #{dimension}
+        AND app_name = #{appName}
+        AND sub_channel = #{subChannel}
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="StatisticsMap">
+        SELECT
+        DATE_FORMAT(t.dimension, '%Y-%m-%d') AS dimension,
+        t.app_name,
+        t.country_id,
+        t.sub_channel,
+        t.clicks,
+        t.conversions,
+        t.rate,
+        t.cost
+        FROM
+        T_STATISTICS t
+        WHERE 1 = 1
+        <if test="endTime != null">
+            AND t.dimension <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND t.dimension <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="appName != null">
+            AND t.app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="subChannel != null">
+            AND t.sub_channel = #{subChannel}
+        </if>
+        <if test="countryId != null">
+            AND t.country_id = #{countryId}
+        </if>
+        ORDER BY t.dimension DESC
+    </select>
+
+    <select id="queryByD" parameterType="map" resultMap="StatisticsMap">
+        SELECT
+          c.dimension,c.app_name,c.country_id,c.sub_channel,c.clicks,c.conversions,c.rate,c.cost
+        FROM
+        (
+            SELECT
+                DATE_FORMAT(t.dimension,  #{dimension}) AS dimension,
+                t.app_name,
+                (SELECT country_name FROM T_COUNTRY where country_id = t.country_id) AS country_id,
+                (SELECT channel_name FROM T_CHANNEL WHERE channel_id = t.sub_channel) AS sub_channel,
+                t.clicks,
+                t.conversions,
+                t.rate,
+                t.cost
+            FROM
+              T_STATISTICS t
+            WHERE 1 = 1
+            <if test="endTime != null">
+                AND t.dimension <![CDATA[ < ]]>  #{endTime}
+            </if>
+            <if test="startTime != null">
+                AND t.dimension <![CDATA[ >= ]]>  #{startTime}
+            </if>
+            <if test="appName != null">
+                AND t.app_name LIKE concat('%',#{appName},'%')
+            </if>
+            <if test="subChannel != null">
+                AND t.sub_channel = #{subChannel}
+            </if>
+            <if test="countryId != null">
+                AND t.country_id = #{countryId}
+            </if>
+        ) c
+        ORDER BY c.dimension DESC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="countByD" parameterType="map" resultType="int">
+        SELECT
+          count(1)
+        FROM
+        T_STATISTICS t
+        WHERE 1 = 1
+        <if test="endTime != null">
+            AND t.dimension <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND t.dimension <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="appName != null">
+            AND t.app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="subChannel != null">
+            AND t.sub_channel = #{subChannel}
+        </if>
+        <if test="countryId != null">
+            AND t.country_id = #{countryId}
+        </if>
+    </select>
+
+    <select id="queryByMY" parameterType="map" resultMap="StatisticsMap">
+        SELECT
+            CONCAT(cs.ds,'-01') AS dimension,
+            cs.app_name,
+            cs.country AS country_id,
+            cs.sub_channel,
+            cs.clicks_sum AS clicks,
+            cs.conversions_sum AS conversions,
+            (cs.conversions_sum / cs.clicks_sum) * 100 AS rate,
+            cs.cost_sum AS cost
+        FROM
+            (
+            SELECT
+                DATE_FORMAT(c.dimension,  #{dimension}) AS ds,
+                c.app_name,
+                (SELECT country_name  FROM T_COUNTRY WHERE country_id = c.country_id ) AS country,
+                (SELECT channel_name FROM T_CHANNEL WHERE channel_id = c.sub_channel) AS sub_channel,
+                SUM(c.clicks) AS clicks_sum,
+                SUM(c.conversions) AS conversions_sum,
+                SUM(c.cost) AS cost_sum
+            FROM
+                (
+                SELECT t.dimension, t.app_name, t.country_id, t.sub_channel, t.clicks, t.conversions, t.rate, t.cost
+                FROM
+                  T_STATISTICS t
+                WHERE 1 = 1
+                <if test="endTime != null">
+                    AND t.dimension <![CDATA[ < ]]>  #{endTime}
+                </if>
+                <if test="startTime != null">
+                    AND t.dimension <![CDATA[ >= ]]>  #{startTime}
+                </if>
+                <if test="appName != null">
+                    AND t.app_name LIKE concat('%',#{appName},'%')
+                </if>
+                <if test="subChannel != null">
+                    AND t.sub_channel = #{subChannel}
+                </if>
+                <if test="countryId != null">
+                    AND t.country_id = #{countryId}
+                </if>
+                ) c
+            GROUP BY ds, c.app_name, c.sub_channel
+            ) cs
+        ORDER BY cs.ds DESC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="countByMY" parameterType="map" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        (
+        SELECT
+        DATE_FORMAT(c.dimension,  #{dimension}) AS ds,
+        c.app_name,
+         c.country_id ,
+         c.sub_channel,
+        SUM(c.clicks) AS clicks_sum,
+        SUM(c.conversions) AS conversions_sum,
+        SUM(c.cost) AS cost_sum
+        FROM
+        (
+        SELECT t.dimension, t.app_name, t.country_id, t.sub_channel, t.clicks, t.conversions, t.rate, t.cost
+        FROM
+        T_STATISTICS t
+        WHERE 1 = 1
+        <if test="endTime != null">
+            AND t.dimension <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND t.dimension <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="appName != null">
+            AND t.app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="subChannel != null">
+            AND t.sub_channel = #{subChannel}
+        </if>
+        <if test="countryId != null">
+            AND t.country_id = #{countryId}
+        </if>
+        ) c
+        GROUP BY ds, c.app_name, c.sub_channel
+        ) cs
+    </select>
+
+</mapper>

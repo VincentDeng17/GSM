@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="gsmp-web:war">
+    <output-path>$PROJECT_DIR$/gsmp-web/target</output-path>
+    <root id="archive" name="gsmp.war">
+      <element id="artifact" artifact-name="gsmp-web:war exploded" />
+    </root>
+  </artifact>
+</component>

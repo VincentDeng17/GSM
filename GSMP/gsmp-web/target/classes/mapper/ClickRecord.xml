@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quanteng.gsmp.reporsity.mapper.ClickRecordMapper">
+
+    <resultMap id="ClickRecordMap" type="ClickRecord">
+        <id property="clickId" column="click_id"></id>
+        <result property="appName" column="app_name"></result>
+        <result property="subClickId" column="sub_click_id"></result>
+        <result property="channel" column="channel"></result>
+        <result property="subChannel" column="sub_channel"></result>
+        <result property="thirdSubChannel" column="third_sub_channel"></result>
+        <result property="subReqParams" column="sub_req_params"></result>
+        <result property="channelUrl" column="channel_url"></result>
+        <result property="clickTime" column="click_time"></result>
+    </resultMap>
+
+    <resultMap id="ClickStatisticsMap" type="ClickStatistics">
+        <result property="dimension" column="dimension"></result>
+        <result property="appName" column="app_name"></result>
+        <result property="subChannel" column="sub_channel"></result>
+        <result property="clicks" column="clicks"></result>
+    </resultMap>
+
+    <insert id="add" parameterType="ClickRecord">
+        INSERT INTO T_CLICK_RECORD (click_id,app_name,sub_click_id,channel,sub_channel,third_sub_channel,sub_req_params,channel_url,click_time)
+        VALUES (#{clickId},#{appName},#{subClickId},#{channel},#{subChannel},#{thirdSubChannel},#{subReqParams},#{channelUrl},DATE_FORMAT(NOW(),'%Y-%m-%d %T'))
+    </insert>
+
+    <update id="modify" parameterType="ClickRecord">
+        UPDATE T_CLICK_RECORD
+        <set>
+            <if test="appName != null">
+                app_name = #{appName},
+            </if>
+            <if test="subClickId != null">
+                sub_click_id = #{subClickId},
+            </if>
+            <if test="channel != null">
+                channel = #{channel},
+            </if>
+            <if test="subChannel != null">
+                sub_channel = #{subChannel},
+            </if>
+            <if test="thirdSubChannel != null">
+                sub_req_params = #{thirdSubChannel},
+            </if>
+            <if test="subReqParams != null">
+                third_sub_channel = #{subReqParams},
+            </if>
+            <if test="channelUrl != null">
+                channel_url = #{channelUrl},
+            </if>
+            click_time = DATE_FORMAT(NOW(),'%Y-%m-%d %T')
+        </set>
+        WHERE click_id = #{clickId}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE  FROM  T_CLICK_RECORD WHERE click_id = #{clickId}
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="ClickRecordMap">
+        SELECT click_id,app_name,sub_click_id,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = channel) as
+        channel,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = sub_channel) as sub_channel,
+        third_sub_channel,sub_req_params,channel_url,click_time
+        FROM T_CLICK_RECORD
+        WHERE 1 = 1
+        <if test="clickId != null">
+            AND click_id = #{clickId}
+        </if>
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="thirdSubChannel != null">
+            AND third_sub_channel = #{thirdSubChannel}
+        </if>
+        <if test="endTime != null">
+            AND click_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND click_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        ORDER BY click_time DESC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="getTotal" parameterType="map" resultType="int">
+        SELECT
+        COUNT(1) AS total
+        FROM(
+        SELECT
+        click_id,app_name,sub_click_id,channel,sub_channel,third_sub_channel,sub_req_params,channel_url,click_time
+        FROM T_CLICK_RECORD
+        WHERE 1 = 1
+        <if test="clickId != null">
+            AND click_id = #{clickId}
+        </if>
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="thirdSubChannel != null">
+            AND third_sub_channel = #{thirdSubChannel}
+        </if>
+        <if test="endTime != null">
+            AND click_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND click_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        ORDER BY click_time DESC
+        ) a
+    </select>
+
+    <select id="queryByClickId" parameterType="String" resultMap="ClickRecordMap">
+        SELECT click_id,app_name,sub_click_id,channel,sub_channel,third_sub_channel,sub_req_params,channel_url,click_time
+        FROM T_CLICK_RECORD
+        WHERE 1 = 1
+        AND click_id = #{clickId}
+    </select>
+
+    <select id="queryCR" parameterType="map" resultMap="ClickStatisticsMap">
+        SELECT DATE_FORMAT(c.click_time, '%Y-%m-%d') AS dimension, c.app_name, c.sub_channel, COUNT(DISTINCT c.sub_click_id) AS clicks
+        FROM
+        (
+            SELECT click_id, app_name, sub_channel, third_sub_channel, sub_click_id, click_time
+            FROM T_CLICK_RECORD
+            WHERE click_time <![CDATA[ < ]]> #{endTime}
+            AND click_time <![CDATA[ >= ]]>  #{startTime}
+        ) c
+        GROUP BY dimension, app_name, sub_channel
+    </select>
+
+</mapper>

@@ -1,0 +1,22 @@
+profiles: dev
+logging:
+  config: classpath:log4j2.xml
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    username: superman
+    password: quanteng@2017
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://118.190.159.157:3306/gsms?autoReconnect=true&useSSL=false&characterEncoding=utf-8
+    maxActive: 200
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+  jedis:
+    host: 192.168.0.11
+    port: 26379
+    maxIdle: 10
+    maxTotal: 100
+    maxWaitMillis: 100000

@@ -1,0 +1,9 @@
+com\quanteng\gsms\reporsity\entity\AppUrlMapping.class
+com\quanteng\gsms\reporsity\entity\DownloadStatistics.class
+com\quanteng\gsms\reporsity\entity\Channel.class
+com\quanteng\gsms\reporsity\entity\ClickRecord.class
+com\quanteng\gsms\reporsity\mapper\DownloadStatisticsMapper.class
+com\quanteng\gsms\reporsity\mapper\ChannelMapper.class
+com\quanteng\gsms\reporsity\mapper\ClickRecordMapper.class
+com\quanteng\gsms\reporsity\mapper\AppUrlMappingMapper.class
+com\quanteng\gsms\reporsity\entity\DownloadCount.class

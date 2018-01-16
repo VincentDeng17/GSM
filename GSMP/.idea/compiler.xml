@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <resourceExtensions />
+    <wildcardResourcePatterns>
+      <entry name="!?*.java" />
+      <entry name="!?*.form" />
+      <entry name="!?*.class" />
+      <entry name="!?*.groovy" />
+      <entry name="!?*.scala" />
+      <entry name="!?*.flex" />
+      <entry name="!?*.kt" />
+      <entry name="!?*.clj" />
+      <entry name="!?*.aj" />
+    </wildcardResourcePatterns>
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+      <profile default="false" name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="gsmp-commom" />
+        <module name="gsmp-database" />
+        <module name="gsmp-provider" />
+        <module name="gsmp-resource" />
+        <module name="gsmp-web" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="1.8">
+      <module name="gsmp" target="1.8" />
+      <module name="gsmp-commom" target="1.8" />
+      <module name="gsmp-database" target="1.8" />
+      <module name="gsmp-provider" target="1.8" />
+      <module name="gsmp-resource" target="1.8" />
+      <module name="gsmp-web" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quanteng.gsmp.reporsity.mapper.DownloadStatisticsMapper">
+
+    <resultMap id="DownloadStatisticsMap" type="DownloadStatistics">
+        <id property="mId" column="m_id"/>
+        <result property="appName" column="app_name"/>
+        <result property="channel" column="channel"/>
+        <result property="subChannel" column="sub_channel"/>
+        <result property="thirdSubChannel" column="third_sub_channel"/>
+        <result property="source" column="source"/>
+        <result property="linkId" column="link_id"/>
+        <result property="subNotifyResult" column="sub_notify_result"/>
+        <result property="notifyTime" column="notify_time"/>
+    </resultMap>
+
+    <resultMap id="DownloadCountMap" type="DownloadCount">
+        <result property="appName" column="app_name"/>
+        <result property="channel" column="channel"/>
+        <result property="subChannel" column="sub_channel"/>
+        <result property="thirdSubChannel" column="third_sub_channel"/>
+        <result property="downloadTimes" column="download_times"/>
+    </resultMap>
+
+    <resultMap id="ConversionDetailMap" type="ConversionDetail">
+        <id property="dimension" column="dimension"/>
+        <result property="appName" column="app_name"/>
+        <result property="channel" column="channel"/>
+        <result property="subChannel" column="sub_channel"/>
+        <result property="thirdSubChannel" column="third_sub_channel"/>
+        <result property="clicks" column="clicks"/>
+        <result property="conversions" column="conversions"/>
+        <result property="conversionsRate" column="rate"/>
+        <result property="cost" column="cost"/>
+    </resultMap>
+
+    <insert id="add" parameterType="DownloadStatistics">
+        INSERT INTO T_DOWNLOAD_STATISTICS (m_id,app_name,channel,sub_channel,third_sub_channel,source,link_id,sub_notify_result,notify_time)
+        VALUES (#{mId},#{appName},#{channel},#{subChannel},#{thirdSubChannel},#{source},#{linkId},#{subNotifyResult},DATE_FORMAT(NOW(),'%Y-%m-%d %T'))
+    </insert>
+
+    <update id="modify" parameterType="DownloadStatistics">
+        UPDATE T_DOWNLOAD_STATISTICS
+        <set>
+            <if test="appName != null">
+                app_name = #{appName},
+            </if>
+            <if test="channel != null">
+                channel = #{channel},
+            </if>
+            <if test="subChannel != null">
+                sub_channel = #{subChannel},
+            </if>
+            <if test="thirdSubChannel != null">
+                third_sub_channel = #{thirdSubChannel},
+            </if>
+            <if test="source != null">
+                source = #{source},
+            </if>
+            <if test="linkId != null">
+                link_id = #{linkId},
+            </if>
+            <if test="subNotifyResult != null">
+                sub_notify_result = #{subNotifyResult},
+            </if>
+            notify_time = DATE_FORMAT(NOW(),'%Y-%m-%d %T')
+        </set>
+        WHERE m_id = #{mId}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE  FROM  T_DOWNLOAD_STATISTICS WHERE m_id = #{mId}
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="DownloadStatisticsMap">
+        SELECT m_id,app_name,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = channel) as channel,(SELECT
+        c.channel_name FROM T_CHANNEL c WHERE c.channel_id = sub_channel) as sub_channel,(SELECT c.channel_name FROM
+        T_CHANNEL c WHERE c.channel_id = third_sub_channel) as
+        third_sub_channel,source,link_id,sub_notify_result,notify_time
+        FROM T_DOWNLOAD_STATISTICS
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="thirdSubChannel != null">
+            AND third_sub_channel = #{thirdSubChannel}
+        </if>
+        <if test="endTime != null">
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        ORDER BY notify_time DESC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="count" resultMap="DownloadCountMap" parameterType="map">
+        SELECT t.app_name,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = channel) as channel
+        <if test="subChannel != null">
+            ,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = sub_channel) as sub_channel
+        </if>
+        <if test="thirdSubChannel != null">
+            ,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = third_sub_channel) as third_sub_channel
+        </if>
+        ,COUNT(t.app_name) as download_times
+        FROM T_DOWNLOAD_STATISTICS t
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="thirdSubChannel != null">
+            AND third_sub_channel = #{thirdSubChannel}
+        </if>
+        <if test="endTime != null">
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        GROUP BY t.app_name
+        <if test="channel != null">
+            ,channel
+        </if>
+        <if test="subChannel != null">
+            ,sub_channel
+        </if>
+        <if test="thirdSubChannel != null">
+            ,third_sub_channel
+        </if>
+        ORDER BY t.app_name ASC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="getTotalByCondition" resultType="int" parameterType="map">
+        SELECT
+        COUNT(1) AS total
+        FROM(
+        SELECT t.app_name,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = channel) as channel,(SELECT
+        c.channel_name FROM T_CHANNEL c WHERE c.channel_id = sub_channel) as sub_channel,(SELECT c.channel_name FROM
+        T_CHANNEL c WHERE c.channel_id = third_sub_channel) as third_sub_channel,COUNT(t.app_name) as download_times
+        FROM T_DOWNLOAD_STATISTICS t
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="thirdSubChannel != null">
+            AND third_sub_channel = #{thirdSubChannel}
+        </if>
+        <if test="endTime != null">
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        GROUP BY t.app_name
+        <if test="channel != null">
+            ,channel
+        </if>
+        <if test="subChannel != null">
+            ,sub_channel
+        </if>
+        <if test="thirdSubChannel != null">
+            ,third_sub_channel
+        </if>
+        ) a
+    </select>
+
+    <select id="getDetailsTotalByCondition" resultType="int" parameterType="map">
+        SELECT
+        COUNT(1) AS total
+        FROM(
+        SELECT m_id,app_name,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = channel) as channel,(SELECT
+        c.channel_name FROM T_CHANNEL c WHERE c.channel_id = sub_channel) as sub_channel,(SELECT c.channel_name FROM
+        T_CHANNEL c WHERE c.channel_id = third_sub_channel) as third_sub_channel,source,link_id,notify_time
+        FROM T_DOWNLOAD_STATISTICS
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="thirdSubChannel != null">
+            AND third_sub_channel = #{thirdSubChannel}
+        </if>
+        <if test="endTime != null">
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        ORDER BY notify_time DESC
+        ) a
+    </select>
+
+    <select id="queryConversion" resultMap="ConversionDetailMap" parameterType="map">
+        SELECT
+        c.count_time AS dimension,
+        c.c_app_name AS app_name,
+        (
+        SELECT
+        l.channel_name
+        FROM
+        T_CHANNEL l
+        WHERE
+        l.channel_id = c.c_channel
+        ) AS channel,
+        (
+        SELECT
+        l.channel_name
+        FROM
+        T_CHANNEL l
+        WHERE
+        l.channel_id = c.c_sub_channel
+        ) AS sub_channel,
+        c.clicks AS clicks,
+        IFNULL(d.conversions, 0) AS conversions,
+        IFNULL((d.conversions / c.clicks), 0) * 100 AS rate,
+        IFNULL(
+        (
+        d.conversions * (
+        SELECT
+        a.price
+        FROM
+        T_APP_URL_MAPPING a
+        WHERE
+        a.app_name = c.c_app_name
+        AND a.sub_channel = c.c_sub_channel
+        )
+        ),
+        0
+        ) AS cost
+        FROM
+        (
+        SELECT
+        DATE_FORMAT(click_time, #{dimension}) AS count_time,
+        app_name AS c_app_name,
+        channel AS c_channel,
+        sub_channel AS c_sub_channel,
+        COUNT(click_id) AS clicks
+        FROM
+        T_CLICK_RECORD
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="endTime != null">
+            AND click_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND click_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        GROUP BY
+        c_app_name,
+        count_time,
+        c_sub_channel
+        ) c
+        LEFT JOIN (
+        SELECT
+        DATE_FORMAT(notify_time, #{dimension}) AS count_time,
+        app_name AS d_app_name,
+        channel AS d_channel,
+        sub_channel AS d_sub_channel,
+        COUNT(m_id) AS conversions
+        FROM
+        T_DOWNLOAD_STATISTICS
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="endTime != null">
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        GROUP BY
+        d_app_name,
+        count_time,
+        d_sub_channel
+        ) d ON c.count_time = d.count_time
+        AND c.c_app_name = d.d_app_name
+        AND c.c_channel = d.d_channel
+        AND c.c_sub_channel = d.d_sub_channel
+        ORDER BY
+        dimension DESC,
+        app_name ASC,
+        channel ASC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="getConversionTotal" resultType="int" parameterType="map">
+        SELECT COUNT(1) AS total
+        FROM
+        (
+        SELECT
+        c.count_time AS dimension,
+        c.c_app_name AS app_name,
+        (
+        SELECT
+        l.channel_name
+        FROM
+        T_CHANNEL l
+        WHERE
+        l.channel_id = c.c_channel
+        ) AS channel,
+        (
+        SELECT
+        l.channel_name
+        FROM
+        T_CHANNEL l
+        WHERE
+        l.channel_id = c.c_sub_channel
+        ) AS sub_channel,
+        c.clicks AS clicks,
+        IFNULL(d.conversions, 0) AS conversions,
+        IFNULL((d.conversions / c.clicks), 0) * 100 AS rate,
+        IFNULL(
+        (
+        d.conversions * (
+        SELECT
+        a.price
+        FROM
+        T_APP_URL_MAPPING a
+        WHERE
+        a.app_name = c.c_app_name
+        AND a.sub_channel = c.c_sub_channel
+        )
+        ),
+        0
+        ) AS cost
+        FROM
+        (
+        SELECT
+        DATE_FORMAT(click_time, #{dimension}) AS count_time,
+        app_name AS c_app_name,
+        channel AS c_channel,
+        sub_channel AS c_sub_channel,
+        COUNT(click_id) AS clicks
+        FROM
+        T_CLICK_RECORD
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="endTime != null">
+            AND click_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND click_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        GROUP BY
+        c_app_name,
+        count_time,
+        c_sub_channel
+        ) c
+        LEFT JOIN (
+        SELECT
+        DATE_FORMAT(notify_time, #{dimension}) AS count_time,
+        app_name AS d_app_name,
+        channel AS d_channel,
+        sub_channel AS d_sub_channel,
+        COUNT(m_id) AS conversions
+        FROM
+        T_DOWNLOAD_STATISTICS
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="endTime != null">
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        GROUP BY
+        d_app_name,
+        count_time,
+        d_sub_channel
+        ) d ON c.count_time = d.count_time
+        AND c.c_app_name = d.d_app_name
+        AND c.c_channel = d.d_channel
+        AND c.c_channel = d.d_channel
+        AND c.c_sub_channel = d.d_sub_channel
+        ORDER BY
+        dimension DESC,
+        app_name ASC,
+        channel ASC
+        ) a
+    </select>
+
+    <select id="queryDS" parameterType="map" resultMap="DownloadStatisticsMap">
+        SELECT m_id,app_name, channel, sub_channel,third_sub_channel,source,link_id,sub_notify_result,notify_time
+        FROM T_DOWNLOAD_STATISTICS
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="thirdSubChannel != null">
+            AND third_sub_channel = #{thirdSubChannel}
+        </if>
+        <if test="endTime != null">
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        ORDER BY notify_time DESC
+    </select>
+
+</mapper>

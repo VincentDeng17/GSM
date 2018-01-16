@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quanteng.gsmp.reporsity.mapper.AppInfoMapper">
+
+    <resultMap id="AppInfoMap" type="AppInfo">
+        <id property="appId" column="app_id"/>
+        <result property="appName" column="app_name"/>
+        <result property="appInfo" column="app_info"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="add" parameterType="AppInfo">
+        INSERT INTO T_APP_INFO (app_id,app_name,app_info,remark,create_time)
+        VALUES (#{appId},#{appName},#{appInfo},#{remark},DATE_FORMAT(NOW(),'%Y-%m-%d %T'))
+    </insert>
+
+    <update id="modify" parameterType="AppInfo">
+        UPDATE T_APP_INFO
+        <set>
+            <if test="appName != null">
+                app_name = #{appName},
+            </if>
+            <if test="appInfo != null">
+                app_info = #{appInfo},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            create_time = DATE_FORMAT(NOW(),'%Y-%m-%d %T')
+        </set>
+        WHERE app_id = #{appId}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        DELETE  FROM  T_APP_INFO WHERE app_id IN 
+        <foreach collection="list" item="appId" index="index" open="(" separator="," close=")">
+          #{appId}
+        </foreach>
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="AppInfoMap">
+        SELECT app_id,app_name,app_info,remark,create_time
+        FROM T_APP_INFO
+        WHERE 1 = 1
+        <if test="appId != null">
+            AND app_id = #{appId}
+        </if>
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="appInfo != null">
+            AND app_info LIKE concat('%',#{appInfo},'%')
+        </if>
+        <if test="remark != null">
+            AND remark LIKE concat('%',#{remark},'%')
+        </if>
+        <if test="startTime != null">
+            AND create_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND create_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        ORDER BY create_time ASC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="queryByAppId" parameterType="String" resultMap="AppInfoMap">
+        SELECT app_id,app_name,app_info,remark,create_time
+        FROM T_APP_INFO
+        WHERE 1 = 1
+        AND app_id = #{appId}
+    </select>
+
+    <select id="count" parameterType="map" resultType="int">
+        SELECT COUNT(*) AS total
+        FROM T_APP_INFO
+        WHERE 1 = 1
+
+        <if test="appId != null">
+            AND app_id = #{appId}
+        </if>
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="appInfo != null">
+            AND app_info LIKE concat('%',#{appInfo},'%')
+        </if>
+        <if test="remark != null">
+            AND remark LIKE concat('%',#{remark},'%')
+        </if>
+        <if test="startTime != null">
+            AND create_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND create_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        ORDER BY create_time ASC
+    </select>
+
+
+</mapper>
