@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/gsms.iml" filepath="$PROJECT_DIR$/gsms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gsms-commom/gsms-commom.iml" filepath="$PROJECT_DIR$/gsms-commom/gsms-commom.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gsms-database/gsms-database.iml" filepath="$PROJECT_DIR$/gsms-database/gsms-database.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gsms-provider/gsms-provider.iml" filepath="$PROJECT_DIR$/gsms-provider/gsms-provider.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gsms-resource/gsms-resource.iml" filepath="$PROJECT_DIR$/gsms-resource/gsms-resource.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gsms-web/gsms-web.iml" filepath="$PROJECT_DIR$/gsms-web/gsms-web.iml" />
+    </modules>
+  </component>
+</project>

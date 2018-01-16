@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/gsms-commom" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/gsms-database" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/gsms-provider" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/gsms-resource" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/gsms-web" vcs="Git" />
+  </component>
+</project>

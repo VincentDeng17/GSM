@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>游戏统计管理</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+  </head>
+  <body class="login-body">
+    <div id="app">
+      <div class="container">
+        <form class="form-signin">
+          <h2 class="form-signin-heading" style="text-align:center;font-size:4em;">GSMP</h2>
+          <label for="userName" class="sr-only">UserName</label>
+          <input type="text" id="userName" class="form-control" placeholder="用户名" required autofocus v-model="userName">
+          <label for="inputPassword" class="sr-only">Password</label>
+          <input type="password" id="inputPassword" class="form-control" placeholder="密码" required v-model="password">
+          <button class="btn btn-lg btn-primary btn-block" type="button" @click="login">登录</button>
+          <div class="error-message" v-if="errorisShow">
+            <span v-text="errorMessage"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/vue.min.js"></script>
+    <script src="js/service/login.js"></script>
+  </body>
+</html>

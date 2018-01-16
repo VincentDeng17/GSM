@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quanteng.gsmp.reporsity.mapper.CountryMapper">
+
+    <resultMap id="CountryMap" type="Country">
+        <id property="countryId" column="country_id"/>
+        <result property="countryAbbreviation" column="country_abbreviation"/>
+        <result property="countryName" column="country_name"/>
+        <result property="englishName" column="english_name"/>
+        <result property="telCode" column="tel_code"/>
+        <result property="createTime" column="create_time"/>
+        <result property="timeZone" column="time_zone"/>
+        <result property="suggestPrice" column="suggest_price"/>
+    </resultMap>
+
+    <sql id="allColumn">
+        country_id,country_abbreviation,country_name,english_name,tel_code,create_time,time_zone,suggest_price
+    </sql>
+
+    <insert id="add" parameterType="Country">
+        INSERT INTO T_COUNTRY
+        (
+          <include refid="allColumn"/>
+        )
+        VALUES
+        (#{countryId},#{countryAbbreviation},#{countryName},#{englishName},#{telCode},DATE_FORMAT(NOW(),'%Y-%m-%d %T'),#{timeZone},#{suggestPrice})
+    </insert>
+
+    <update id="modify" parameterType="Country">
+        UPDATE T_COUNTRY
+        <set>
+            <if test="countryAbbreviation != null">
+                country_abbreviation = #{countryAbbreviation},
+            </if>
+            <if test="countryName != null">
+                country_name = #{countryName},
+            </if>
+            <if test="englishName != null">
+                english_name = #{englishName},
+            </if>
+            <if test="telCode != null">
+                tel_code = #{telCode},
+            </if>
+            <if test="timeZone != null">
+                time_zone = #{timeZone},
+            </if>
+            <if test="suggestPrice != null">
+                suggest_price = #{suggestPrice},
+            </if>
+            create_time = DATE_FORMAT(NOW(),'%Y-%m-%d %T')
+        </set>
+        WHERE country_id = #{countryId}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE  FROM  T_COUNTRY WHERE country_id IN
+        <foreach collection="list" item="countryId" index="index" open="(" separator="," close=")">
+            #{countryId}
+        </foreach>
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="CountryMap">
+        SELECT
+        <include refid="allColumn"/>
+        FROM T_COUNTRY
+        WHERE 1 = 1
+        <if test="countryId != null">
+            AND country_id = #{countryId}
+        </if>
+        <if test="countryAbbreviation != null">
+            AND country_abbreviation = #{countryAbbreviation}
+        </if>
+        <if test="countryName != null">
+            AND country_name LIKE concat('%',#{countryName},'%')
+        </if>
+        <if test="englishName != null">
+            AND english_name LIKE concat('%',#{englishName},'%')
+        </if>
+        <if test="endTime != null">
+            AND create_time <![CDATA[ <]]> #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND create_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="timeZone != null">
+            AND time_zone = #{timeZone}
+        </if>
+        <if test="suggestPrice != null">
+            AND suggest_price = #{suggestPrice}
+        </if>
+        <if test="telCode != null">
+            AND tel_code = #{telCode}
+        </if>
+        ORDER BY country_abbreviation ASC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="queryById" parameterType="String" resultMap="CountryMap">
+        SELECT
+        <include refid="allColumn"/>
+        FROM T_COUNTRY
+        WHERE 1 = 1
+        AND country_id = #{countryId}
+    </select>
+
+    <select id="count" parameterType="map" resultType="int">
+        SELECT COUNT(*) AS total
+        FROM T_COUNTRY
+        WHERE 1 = 1
+        <if test="countryId != null">
+            AND country_id = #{countryId}
+        </if>
+        <if test="countryAbbreviation != null">
+            AND country_abbreviation = #{countryAbbreviation}
+        </if>
+        <if test="countryName != null">
+            AND country_name LIKE concat('%',#{countryName},'%')
+        </if>
+        <if test="englishName != null">
+            AND english_name LIKE concat('%',#{englishName},'%')
+        </if>
+        <if test="endTime != null">
+            AND create_time <![CDATA[ <]]> #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND create_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="timeZone != null">
+            AND time_zone = #{timeZone}
+        </if>
+        <if test="suggestPrice != null">
+            AND suggest_price = #{suggestPrice}
+        </if>
+        ORDER BY country_abbreviation ASC
+    </select>
+
+
+</mapper>

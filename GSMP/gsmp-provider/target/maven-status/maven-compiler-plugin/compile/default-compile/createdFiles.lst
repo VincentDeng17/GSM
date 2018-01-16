@@ -1,0 +1,13 @@
+com\quanteng\gsmp\provider\impl\channel\ChannelManageResourceImpl.class
+com\quanteng\gsmp\provider\impl\appconfig\AppConfigResourceImpl.class
+com\quanteng\gsmp\provider\impl\app\AppResourceImpl.class
+com\quanteng\gsmp\provider\impl\url\UrlManageResourceImpl.class
+com\quanteng\gsmp\provider\impl\init\PageInitResourceImpl.class
+com\quanteng\gsmp\provider\impl\download\DownloadManageResourceImpl.class
+com\quanteng\gsmp\provider\impl\task\TaskResourceImpl.class
+com\quanteng\gsmp\provider\impl\Test.class
+com\quanteng\gsmp\provider\impl\country\CountryManageResourceImpl.class
+com\quanteng\gsmp\provider\impl\user\UserResourceImpl.class
+com\quanteng\gsmp\provider\impl\BasicMethod.class
+com\quanteng\gsmp\provider\impl\service\ServiceInfoManageResourceImpl.class
+com\quanteng\gsmp\provider\impl\click\ClickRecordResourceImpl.class

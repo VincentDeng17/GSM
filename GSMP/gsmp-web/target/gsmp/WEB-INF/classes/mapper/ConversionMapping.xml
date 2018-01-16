@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quanteng.gsmp.reporsity.mapper.ConversionMapper">
+
+    <resultMap id="ConversionMap" type="Conversion">
+        <id property="conversionId" column="conversion_id"/>
+        <result property="appName" column="app_name"/>
+        <result property="channel" column="channel"/>
+        <result property="subChannel" column="sub_channel"/>
+        <result property="thirdSubChannel" column="third_sub_channel"/>
+        <result property="source" column="source"/>
+        <result property="linkId" column="link_id"/>
+        <result property="notifyStatus" column="notify_status"/>
+        <result property="subNotifyResult" column="sub_notify_result"/>
+        <result property="notifyTime" column="notify_time"/>
+    </resultMap>
+
+    <resultMap id="ConversionStatisticsMap" type="ConversionStatistics">
+        <id property="dimension" column="dimension"/>
+        <result property="appName" column="app_name"/>
+        <result property="subChannel" column="sub_channel"/>
+        <result property="conversions" column="conversions"/>
+        <result property="cost" column="cost"/>
+    </resultMap>
+
+    <insert id="add" parameterType="Conversion">
+        INSERT INTO T_CONVERSION (conversion_id,app_name,channel,sub_channel,third_sub_channel,source,link_id,notify_status,sub_notify_result,notify_time)
+        VALUES (#{conversionId},#{appName},#{channel},#{subChannel},#{thirdSubChannel},#{source},#{linkId},#{notifyStatus},#{subNotifyResult},#{notifyTime})
+    </insert>
+
+    <update id="modify" parameterType="Conversion">
+        UPDATE T_CONVERSION
+        <set>
+            <if test="appName != null">
+                app_name = #{appName},
+            </if>
+            <if test="channel != null">
+                channel = #{channel},
+            </if>
+            <if test="subChannel != null">
+                sub_channel = #{subChannel},
+            </if>
+            <if test="thirdSubChannel != null">
+                third_sub_channel = #{thirdSubChannel},
+            </if>
+            <if test="source != null">
+                source = #{source},
+            </if>
+            <if test="linkId != null">
+                link_id = #{linkId},
+            </if>
+            <if test="notify_status != null">
+                notify_status = #{notifyStatus},
+            </if>
+            <if test="subNotifyResult != null">
+                sub_notify_result = #{subNotifyResult},
+            </if>
+            notify_time = DATE_FORMAT(NOW(),'%Y-%m-%d %T')
+        </set>
+        WHERE conversion_id = #{conversionId}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE  FROM  T_CONVERSION WHERE conversion_id = #{conversionId}
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="ConversionMap">
+        SELECT conversion_id,app_name,channel, sub_channel,
+        third_sub_channel,source,link_id,notify_status,sub_notify_result,notify_time
+        FROM T_CONVERSION
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="channel != null">
+            AND channel = #{channel}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="thirdSubChannel != null">
+            AND third_sub_channel = #{thirdSubChannel}
+        </if>
+        <if test="notifyStatus != null">
+            AND notify_status = #{notifyStatus}
+        </if>
+        <if test="endTime != null">
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        ORDER BY notify_time DESC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="queryDetails" parameterType="map" resultMap="ConversionMap">
+        SELECT conversion_id,app_name,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = channel) as channel,
+        (SELECT
+        c.channel_name FROM T_CHANNEL c WHERE c.channel_id = sub_channel) as sub_channel,
+        third_sub_channel,source,link_id,notify_status,sub_notify_result,notify_time
+        FROM T_CONVERSION
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="linkId != null">
+            AND link_id = #{linkId}
+        </if>
+        <if test="notifyStatus != null">
+            AND notify_status = #{notifyStatus}
+        </if>
+        <if test="endTime != null">
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        ORDER BY notify_time DESC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="getCount" parameterType="map" resultType="int">
+        SELECT COUNT(1) AS total
+        FROM T_CONVERSION
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="linkId != null">
+            AND link_id = #{linkId}
+        </if>
+        <if test="notifyStatus != null">
+            AND notify_status = #{notifyStatus}
+        </if>
+        <if test="endTime != null">
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+        </if>
+        <if test="startTime != null">
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+    </select>
+
+    <select id="queryCS" parameterType="map" resultMap="ConversionStatisticsMap">
+        SELECT dimension, app_name, sub_channel, conversions, conversions * price AS cost
+        FROM
+        (
+            SELECT
+                DATE_FORMAT(t.notify_time, '%Y-%m-%d') AS dimension, t.app_name, sub_channel, COUNT(DISTINCT t.link_id) AS conversions,
+                (
+                    SELECT
+                    a.price
+                    FROM
+                    T_APP_URL_MAPPING a
+                    WHERE
+                    a.app_name = t.app_name
+                    AND a.sub_channel = t.sub_channel
+                ) AS price
+            FROM
+              T_CONVERSION t
+            WHERE t.notify_status = 0
+            AND notify_time <![CDATA[ < ]]>  #{endTime}
+            AND notify_time <![CDATA[ >= ]]>  #{startTime}
+            GROUP BY dimension, app_name, sub_channel
+        ) c
+    </select>
+
+</mapper>

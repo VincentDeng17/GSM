@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.quanteng</groupId>
+    <artifactId>gsms</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <quanten.tools.version>3.0</quanten.tools.version>
+        <quanten.jedis.version>1.0.0</quanten.jedis.version>
+        <log4j.version>3.3.6</log4j.version>
+        <vas.version>1.0-SNAPSHOT</vas.version>
+        <mybatis.version>3.2.8</mybatis.version>
+        <mybatis.spring.version>1.2.3</mybatis.spring.version>
+        <ali.durid.version>1.0.20</ali.durid.version>
+    </properties>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.6.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.8</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    <modules>
+        <module>gsms-web</module>
+        <module>gsms-resource</module>
+        <module>gsms-provider</module>
+        <module>gsms-database</module>
+        <module>gsms-commom</module>
+    </modules>
+
+
+</project>

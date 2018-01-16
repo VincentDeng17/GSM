@@ -1,0 +1,3 @@
+com\quanteng\gsms\resource\download\response\DownloadInfoResp.class
+com\quanteng\gsms\resource\servlet\GsmsServletResource.class
+com\quanteng\gsms\resource\download\DownloadManageResource.class

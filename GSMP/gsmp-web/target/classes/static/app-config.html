@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>游戏统计管理</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <style>
+        .app-real-name{
+            height: 100%;
+            float: left;
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+<div id="config">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                        aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">GSMP</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <!--<li><a href="index.html">主页</a></li>-->
+                    <li><a href="urlMapping.html">推广配置管理</a></li>
+                    <li><a href="channel.html">渠道管理</a></li>
+                    <li><a href="country.html">国家管理</a></li>
+                    <li><a href="service.html">运营商管理</a></li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">应用管理<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="app.html">应用详情</a></li>
+                            <li><a href="app-config.html">应用配置</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">统计管理<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="conversion.html">转化统计</a></li>
+                            <li><a href="download-details.html">转化详情</a></li>
+                            <li><a href="clickRecord.html">点击详情</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="about.html">关于</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a>{{userName}}</a></li>
+                    <li><a class="logout" @click="logout"><span class="glyphicon glyphicon-log-out"
+                                                                aria-hidden="true"></span>&nbsp;退出登录</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="title-head">
+            <h2 class="sub-header">应用配置</h2>
+        </div>
+
+        <div id="search">
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="search-country">国家名称：</label>
+                    <select class="form-control" v-model="search_countryId" id="search-country">
+                        <option value="">--请选择--</option>
+                        <option v-for="countryInfo in countryList" :value="countryInfo.countryId">
+                            {{countryInfo.countryName}}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="search-service">运营商名称：</label>
+                    <select class="form-control" v-model="search_serviceId" id="search-service">
+                        <option value="">--请选择--</option>
+                        <option v-for="serviceInfo in serviceList" :value="serviceInfo.serviceId">
+                            {{serviceInfo.serviceName}}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="search-appName">原应用名称：</label>
+                    <select class="form-control" v-model="search_appName" id="search-appName">
+                        <option value="">--请选择--</option>
+                        <option v-for="appInfo in appList" :value="appInfo.appName">
+                            {{appInfo.appName}}
+                        </option>
+                    </select>
+                </div>
+                <div class="newline"></div>
+                <div class="form-group">
+                    <label for="start-time">开始时间：</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="start-time" data-date-format="yyyy-mm-dd"
+                               readonly placeholder="单击选择开始时间" v-model="startTime">
+                        <span class="input-group-btn">
+                  <button id="start-time-clear" class="btn btn-default" type="button">x</button>
+                </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="end-time">结束时间：</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="end-time" data-date-format="yyyy-mm-dd"
+                               readonly placeholder="单击选择结束时间" v-model="endTime">
+                        <span class="input-group-btn">
+                  <button id="end-time-clear" class="btn btn-default" type="button">x</button>
+                </span>
+                    </div>
+                </div>
+                <div class="newline"></div>
+                <button type="button" class="btn btn-primary" @click="search(1)">查询</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModalLabel">新增
+                </button>
+                <button type="button" class="btn btn-primary" @click="del">删除</button>
+                <button type="button" class="btn btn-primary" @click="openEditDialog">编辑</button>
+            </div>
+        </div>
+
+        <div class="table-responsive table-margin">
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr class="table-nonewline">
+                    <th><input type="checkbox" v-model="allCheckStatus" @click="selectAll"></th>
+                    <th>序号</th>
+                    <th>所属国家</th>
+                    <th>运营商</th>
+                    <th>原应用名称</th>
+                    <th>真实应用名称</th>
+                    <th>原始链接</th>
+                    <th>配置时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(appConfig,index) in appConfigList">
+                    <td><input type="checkbox" :value="appConfig.configId" v-model="checkboxStatus[index]"></td>
+                    <td>{{index+1}}</td>
+                    <td>{{appConfig.countryAbbreviation}}</td>
+                    <td>{{appConfig.serviceName}}</td>
+                    <td>{{appConfig.originalAppName}}</td>
+                    <td>{{appConfig.appName}}</td>
+                    <td>{{appConfig.originalUrl}}</td>
+                    <td>{{appConfig.createTime}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li>
+                    <a @click="search(1)" aria-label="Search results pages" style="cursor: pointer;">首页</a>
+                </li>
+                <li :class="{disabled : !previous_status}">
+                    <a aria-label="Previous" @click="search(pageIndex-1)" v-if="previous_status"
+                       style="cursor: pointer;">
+                        <span aria-hidden="true">上一页</span>
+                    </a>
+                    <a aria-label="Previous" v-else>
+                        <span aria-hidden="true">上一页</span>
+                    </a>
+                </li>
+
+                <li v-if="pageIndex>=5">
+                    <a><span>...</span></a>
+                </li>
+
+                <li :class="{active: pageIndex == n}" v-for="n in totalPage" v-if="n>=pageIndex-3 && n<=pageIndex+3"
+                    style="cursor: pointer;">
+                    <a @click="search(n)" aria-label="Search results pages">{{n}}</a>
+                </li>
+
+                <li v-if="pageIndex<=totalPage-4">
+                    <a><span>...</span></a>
+                </li>
+
+                <li :class="{disabled : !next_status}">
+                    <a aria-label="Next" @click="search(pageIndex+1)" v-if="next_status" style="cursor: pointer;">
+                        <span aria-hidden="true">下一页</span>
+                    </a>
+                    <a aria-label="Next" v-else>
+                        <span aria-hidden="true">下一页</span>
+                    </a>
+                </li>
+                <li class="disabled"><a>共{{total}}条&nbsp;&nbsp;{{pageIndex}}/{{totalPage}}页</a></li>
+                <li>
+                    <a @click="search(totalPage)" aria-label="Search results pages" style="cursor: pointer;">尾页</a>
+                </li>
+                <li><input type="number" min="1" v-model="skipPageNumber" placeholder="跳转"></li>
+                <li>
+                    <button @click="search(skipPageNumber)">GO</button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+
+    <!-- 新增窗口modal -->
+   <div class="modal fade" id="addModalLabel" tabindex="-1" role="dialog" aria-labelledby="addModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="">新增</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="form-group">
+                            <label for="add-country-list">国家名称：</label>
+                            <select class="form-control" v-model="country_Id" id="add-country-list">
+                                <option value="">--请选择--</option>
+                                <option v-for="countryInfo in countryList" :value="countryInfo.countryId">
+                                    {{countryInfo.countryAbbreviation}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-service-list">运营商名称：</label>
+                            <select class="form-control" v-model="service_Id" id="add-service-list">
+                                <option value="">--请选择--</option>
+                                <option v-for="serviceInfo in serviceList" :value="serviceInfo.serviceId">
+                                    {{serviceInfo.serviceName}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-app-list">原应用名称：</label>
+                            <select class="form-control" v-model="app_Id" id="add-app-list">
+                                <option value="">--请选择--</option>
+                                <option v-for="appInfo in appList" :value="appInfo.appId">
+                                    {{appInfo.appName}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-app-url" class="control-label">真实应用名称：</label>
+                            <div class="form-control">
+                                <div class="app-real-name" id="add-name-one"></div>
+                                <div class="app-real-name" id = "add-name-two"></div>
+                                <div class="app-real-name" id = "add-name-three"></div>
+                            </div>
+                            <!--<input type="text" class="form-control" readonly id="add-app-name"
+                                   v-model="realAppName">-->
+                        </div>
+                        <div class="form-group">
+                            <label for="add-app-url" class="control-label">原始链接：</label>
+                            <input type="text" class="form-control" id="add-app-url" placeholder="原始链接"
+                                   v-model="originalUrl">
+                        </div>
+                    </div>
+                    <span style="color:red" v-show="errorMessageShow" id="errorMessage">{{errorMessage}}</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" @click="addAppConfig">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  <!--  修改窗口-->
+    <div class="modal fade" id="modifyModalLabel" tabindex="-1" role="dialog" aria-labelledby="addModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id=" ">编辑</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="form-group">
+                            <label for="add-country-list">国家名称：</label>
+                            <select class="form-control" v-model="edit_country_Id" id="modify-country-list">
+                                <option value="">--请选择--</option>
+                                <option v-for="countryInfo in countryList" :value="countryInfo.countryId">
+                                    {{countryInfo.countryAbbreviation}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-service-list">运营商名称：</label>
+                            <select class="form-control" v-model="edit_service_Id" id="modify-service-list">
+                                <option value="">--请选择--</option>
+                                <option v-for="serviceInfo in serviceList" :value="serviceInfo.serviceId">
+                                    {{serviceInfo.serviceName}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-app-list">原应用名称：</label>
+                            <select class="form-control" v-model="edit_app_Id" id="modify-app-list">
+                                <option value="">--请选择--</option>
+                                <option v-for="appInfo in appList" :value="appInfo.appId">
+                                    {{appInfo.appName}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-app-url" class="control-label">真实应用名称：</label>
+                            <div class="form-control">
+                                <div class="app-real-name" id="modify-name-one"></div>
+                                <div class="app-real-name" id = "modify-name-two"></div>
+                                <div class="app-real-name" id = "modify-name-three"></div>
+                            </div>
+                            <!--<input type="text" class="form-control" readonly id="modify-app-name"
+                                   v-model="realAppName">-->
+                        </div>
+                        <div class="form-group">
+                            <label for="add-app-url" class="control-label">原始链接：</label>
+                            <input type="text" class="form-control" id="modify-app-url" placeholder="原始链接（必填）"
+                                   v-model="edit_originalUrl">
+                        </div>
+                    </div>
+                    <span style="color:red" v-show="edit_errorMessageShow" id="errorMessage1">{{edit_errorMessage}}</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" @click="updateConfig">更新保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+   <!--信息删除确认-->
+    <div class="modal fade" id="delcfmModel">
+        <div class="modal-dialog">
+            <div class="modal-content message_align">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">提示信息</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您确认要删除吗？</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button @click="deleteConfig" class="btn btn-danger" data-dismiss="modal">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrap-datetimepicker.js"></script>
+<script src="js/common.js"></script>
+<script src="js/vue.min.js"></script>
+<script src="js/service/app-config.js"></script>
+</body>
+</html>

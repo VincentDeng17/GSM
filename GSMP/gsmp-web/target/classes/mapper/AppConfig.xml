@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quanteng.gsmp.reporsity.mapper.AppConfigMapper">
+
+    <resultMap id="AppConfigMap" type="AppConfig">
+        <id property="configId" column="config_id"/>
+        <result property="countryId" column="country_id"/>
+        <result property="countryAbbreviation" column="country_abbreviation"/>
+        <result property="serviceId" column="service_id"/>
+        <result property="serviceName" column="service_name"/>
+        <result property="appId" column="app_id"/>
+        <result property="appName" column="app_name"/>
+        <result property="originalUrl" column="original_url"/>
+        <result property="createTime" column="create_time"/>
+        <result property="originalAppName" column="original_app_name"/>
+    </resultMap>
+
+    <insert id="add" parameterType="AppConfig">
+        INSERT INTO T_APP_CONFIG (config_id,country_id,service_id,app_id,app_name,original_url,create_time)
+        VALUES (#{configId},#{countryId},#{serviceId},#{appId},#{appName},#{originalUrl},DATE_FORMAT(NOW(),'%Y-%m-%d %T'))
+    </insert>
+
+    <update id="modify" parameterType="AppConfig">
+        UPDATE T_APP_CONFIG
+        <set>
+            <if test="countryId != null">
+                country_id = #{countryId},
+            </if>
+            <if test="serviceId != null">
+                service_id = #{serviceId},
+            </if>
+            <if test="appId != null">
+                app_id = #{appId},
+            </if>
+            <if test="appName != null">
+                app_name = #{appName},
+            </if>
+            <if test="originalUrl != null">
+                original_url = #{originalUrl},
+            </if>
+            create_time = DATE_FORMAT(NOW(),'%Y-%m-%d %T')
+        </set>
+        WHERE config_id = #{configId}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE  FROM  T_APP_CONFIG WHERE config_id = #{configId}
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="AppConfigMap">
+        SELECT
+        t.config_id config_id,
+        t.country_id country_id,
+        a.country_abbreviation country_abbreviation,
+        t.service_id service_id,
+        s.service_name service_name,
+        t.app_id app_id,
+        t.app_name app_name,
+        t.original_url original_url,
+        t.create_time create_time,
+        p.app_name original_app_name
+        FROM T_APP_CONFIG t , T_SERVICE s , T_COUNTRY a , T_APP_INFO p
+        WHERE 1 = 1
+        AND
+        t.service_id = s.service_id
+        AND
+        t.country_id = a.country_id
+        AND
+        t.app_id = p.app_id
+        <if test="configId != null">
+            AND t.config_id = #{configId}
+        </if>
+        <if test="countryId != null">
+            AND t.country_id = #{countryId}
+        </if>
+        <if test="serviceId != null">
+            AND t.service_id = #{serviceId}
+        </if>
+        <if test="appId != null">
+            AND t.app_id = #{appId}
+        </if>
+        <if test="appName != null">
+            AND t.app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="originalUrl != null">
+            AND t.original_url = #{originalUrl}
+        </if>
+        <if test="startTime != null">
+            AND t.create_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND t.create_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        ORDER BY t.app_name ASC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="queryByConfigId" parameterType="String" resultMap="AppConfigMap">
+        SELECT config_id,country_id,service_id,app_id,app_name,original_url,create_time
+        FROM T_APP_CONFIG
+        WHERE 1 = 1
+        AND config_id = #{configId}
+    </select>
+
+    <select id="count" parameterType="map" resultType="int">
+        SELECT COUNT(*) AS total
+        FROM T_APP_CONFIG
+        WHERE 1 = 1
+        <if test="configId != null">
+            AND config_id = #{configId}
+        </if>
+        <if test="countryId != null">
+            AND country_id = #{countryId}
+        </if>
+        <if test="serviceId != null">
+            AND service_id = #{serviceId}
+        </if>
+        <if test="appId != null">
+            AND app_id = #{appId}
+        </if>
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="startTime != null">
+            AND create_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND create_time <![CDATA[ < ]]> #{endTime}
+        </if>
+        ORDER BY app_name ASC
+    </select>
+
+    <delete id="batchDelete" parameterType="java.util.List">
+        DELETE  FROM  T_APP_CONFIG WHERE config_id IN
+        <foreach collection="list" item="configId" index="index" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </delete>
+
+
+</mapper>

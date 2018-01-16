@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quanteng.gsmp.reporsity.mapper.CountryServiceMapper">
+
+    <resultMap id="CountryServiceMap" type="CountryService">
+        <id property="countryId" column="country_id"/>
+        <result property="serviceId" column="service_id"/>
+    </resultMap>
+
+    <insert id="add" parameterType="CountryService">
+        INSERT INTO T_COUNTRY_SERVICE (country_id,service_id)
+        VALUES (#{countryId},#{serviceId})
+    </insert>
+
+    <update id="modify" parameterType="CountryService">
+        UPDATE T_COUNTRY_SERVICE
+        <set>
+            <if test="serviceId != null">
+                service_id = #{serviceId},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks},
+            </if>
+        </set>
+        WHERE country_id = #{countryId}
+    </update>
+
+    <delete id="delete" parameterType="CountryService">
+        DELETE  FROM  T_COUNTRY_SERVICE WHERE country_id = #{countryId} AND service_id = #{serviceId}
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="CountryServiceMap">
+        SELECT country_id,service_id
+        FROM T_COUNTRY_SERVICE
+        WHERE 1 = 1
+        <if test="countryId != null">
+            AND country_id = #{countryId}
+        </if>
+        <if test="serviceId != null">
+            AND service_id = #{serviceId}
+        </if>
+        ORDER BY country_id ASC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="count" parameterType="map" resultType="int">
+        SELECT COUNT(*) AS total
+        FROM T_COUNTRY_SERVICE
+        WHERE 1 = 1
+        <if test="countryId != null">
+            AND country_id = #{countryId}
+        </if>
+        <if test="serviceId != null">
+            AND service_id = #{serviceId}
+        </if>
+        ORDER BY country_id ASC
+    </select>
+
+</mapper>

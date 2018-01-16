@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quanteng.gsms.reporsity.mapper.AppUrlMappingMapper">
+
+    <resultMap id="AppUrlMappingMap" type="AppUrlMapping">
+        <id property="mId" column="m_id"/>
+        <result property="appName" column="app_name"/>
+        <result property="hwUrl" column="hw_url"/>
+        <result property="clickId" column="click_id"/>
+        <result property="subChannel" column="sub_channel"/>
+        <result property="thirdSubChannel" column="third_sub_channel"/>
+        <result property="price" column="price"/>
+        <result property="promotionalUrl" column="promotional_url"/>
+        <result property="insertTime" column="insert_time"/>
+    </resultMap>
+
+    <insert id="add" parameterType="AppUrlMapping">
+        INSERT INTO T_APP_URL_MAPPING(m_id,app_name,hw_url,click_id,sub_channel,third_sub_channel,price,promotional_url, insert_time)
+        VALUES (#{mId},#{appName},#{hwUrl},#{clickId},#{subChannel},#{thirdSubChannel},#{price},#{promotionalUrl},DATE_FORMAT(NOW(),'%Y-%m-%d %T'))
+    </insert>
+
+    <update id="modify" parameterType="AppUrlMapping">
+        UPDATE T_APP_URL_MAPPING
+        <set>
+            <if test="appName != null">
+                app_name = #{appName},
+            </if>
+            <if test="hwUrl != null">
+                hw_url = #{hwUrl},
+            </if>
+            <if test="clickId != null">
+                click_id = #{clickId},
+            </if>
+            <if test="subChannel != null">
+                sub_channel = #{subChannel},
+            </if>
+            <if test="thirdSubChannel != null">
+                third_sub_channel = #{thirdSubChannel},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="promotionalUrl != null">
+                promotional_url = #{promotionalUrl},
+            </if>
+            insert_time = DATE_FORMAT(NOW(),'%Y-%m-%d %T')
+        </set>
+        WHERE m_id = #{mId}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE  FROM  T_APP_URL_MAPPING WHERE m_id = #{mId}
+    </delete>
+
+    <select id="query" parameterType="map" resultMap="AppUrlMappingMap">
+        SELECT m_id,app_name,hw_url,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = click_id) as click_id,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = sub_channel) as sub_channel,(SELECT c.channel_name FROM T_CHANNEL c WHERE c.channel_id = third_sub_channel) as third_sub_channel,price,promotional_url,insert_time
+        FROM T_APP_URL_MAPPING
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="hwUrl != null">
+            AND hw_url = #{hwUrl}
+        </if>
+        <if test="clickId != null">
+            AND click_id = #{clickId}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="thirdSubChannel != null">
+            AND third_sub_channel = #{thirdSubChannel}
+        </if>
+        <if test="startTime != null">
+            AND insert_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND insert_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        ORDER BY m_id DESC
+        <if test="start != null and psize != null">
+            LIMIT #{start}, #{psize}
+        </if>
+    </select>
+
+    <select id="queryByMId" parameterType="String" resultMap="AppUrlMappingMap">
+        SELECT m_id,app_name,hw_url,click_id,sub_channel,third_sub_channel,price,promotional_url,insert_time
+        FROM T_APP_URL_MAPPING
+        WHERE m_id = #{mId}
+    </select>
+
+    <select id="getTotalByCondition" parameterType="map" resultType="int">
+        SELECT COUNT(*) AS total
+        FROM T_APP_URL_MAPPING
+        WHERE 1 = 1
+        <if test="appName != null">
+            AND app_name LIKE concat('%',#{appName},'%')
+        </if>
+        <if test="clickId != null">
+            AND click_id = #{clickId}
+        </if>
+        <if test="subChannel != null">
+            AND sub_channel = #{subChannel}
+        </if>
+        <if test="thirdSubChannel != null">
+            AND third_sub_channel = #{thirdSubChannel}
+        </if>
+        <if test="startTime != null">
+            AND insert_time <![CDATA[ >= ]]>  #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND insert_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+    </select>
+
+</mapper>
