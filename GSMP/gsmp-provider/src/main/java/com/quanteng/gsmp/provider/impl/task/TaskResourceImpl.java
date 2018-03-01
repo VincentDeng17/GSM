@@ -15,7 +15,10 @@ import com.quanteng.gsmp.commom.core.utils.DateManager;
 import com.quanteng.gsmp.reporsity.entity.*;
 import com.quanteng.gsmp.reporsity.mapper.*;
 import com.quanteng.gsmp.resource.task.TaskResource;
+<<<<<<< HEAD
 import com.quanteng.gsmp.resource.task.request.CHReq;
+=======
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
 import com.quanteng.gsmp.resource.task.request.CSReq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +59,12 @@ public class TaskResourceImpl implements TaskResource {
     @Autowired
     CountryMapper countryMapper;
 
+<<<<<<< HEAD
     @Autowired
     AppUrlMappingMapper appUrlMappingMapper;
 
+=======
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
     /**
      * 定时统计点击转化数据
      * opType 0-定时统计，1-手动统计
@@ -66,6 +72,10 @@ public class TaskResourceImpl implements TaskResource {
      * @param req
      */
     @Override
+<<<<<<< HEAD
+=======
+//    public void conversionStatistics(String opType, String startTime, String endTime) {
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
     public void conversionStatistics(CSReq req) {
         LOGGER.debug(String.format("[TaskResourceImpl].[conversionStatistics]---->[Begin]" +
                 ":{}" + DateManager.dateToString(new Date(), "yyyy-MM-dd HH:mm:ss") + " [CSReq]:" + req));
@@ -142,7 +152,11 @@ public class TaskResourceImpl implements TaskResource {
 ////                            if (!isEquals) {
 //                                updateStatisticsList.add(s);
 //                            }
+<<<<<<< HEAD
                             updateStatisticsList.add(s);
+=======
+                        updateStatisticsList.add(s);
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
                         }
                     } else {
                         insertStatisticsList.add(s);
@@ -172,6 +186,7 @@ public class TaskResourceImpl implements TaskResource {
      * opType 0-最新数据同步，1-全量数据同步
      */
     @Override
+<<<<<<< HEAD
     public void conversionHandle(CHReq req) {
         LOGGER.debug(String.format("[TaskResourceImpl].[conversionHandle]---->[Begin]:{}" + DateManager.dateToString(new Date(), "yyyy-MM-dd HH:mm:ss") + " [CHReq]:" + req));
         try {
@@ -189,6 +204,19 @@ public class TaskResourceImpl implements TaskResource {
             } else if ("1".equals(opType)) {
                 String startTime = req.getStartTime();
                 String endTime = req.getEndTime();
+=======
+    public void conversionHandle(String opType) {
+        LOGGER.debug(String.format("[TaskResourceImpl].[conversionHandle]---->[Begin]:{}" + DateManager.dateToString(new Date(), "yyyy-MM-dd HH:mm:ss") + " [opType]:" + opType));
+        try {
+
+            Date startDate = DateManager.addDays(new Date(), -1);
+            Date endDate = DateManager.addDays(new Date(), 1);
+            String startTime = DateManager.dateToString(startDate, "yyyy-MM-dd") + " 00:00:00";
+            String endTime = DateManager.dateToString(endDate, "yyyy-MM-dd") + " 00:00:00";
+
+            Map<String, Object> params = new HashMap();
+            if ("0".equals(opType)) {
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
                 params.put("startTime", startTime);
                 params.put("endTime", endTime);
             }
@@ -308,7 +336,10 @@ public class TaskResourceImpl implements TaskResource {
 
     /**
      * 给点击统计实体赋转化数据值
+<<<<<<< HEAD
      * 20180204 优化：cost在此方法内计算，减少SQL运行错误
+=======
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
      *
      * @param statistics
      * @param csList
@@ -318,7 +349,10 @@ public class TaskResourceImpl implements TaskResource {
         try {
             //转化率保留4位小数
             DecimalFormat df = new DecimalFormat("##.0000");
+<<<<<<< HEAD
             DecimalFormat df1 = new DecimalFormat("##.00");
+=======
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
             for (int i = 0; i < csList.size(); i++) {
                 ConversionStatistics cs = csList.get(i);
                 String dimension = cs.getDimension();
@@ -326,7 +360,10 @@ public class TaskResourceImpl implements TaskResource {
                 String subChannel = cs.getSubChannel();
                 if (dimension.equals(DateManager.dateToString(statistics.getDimension(), "yyyy-MM-dd"))
                         && appName.equals(statistics.getAppName()) && subChannel.equals(statistics.getSubChannel())) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
                     statistics.setConversions(cs.getConversions());
 //                    double rate = (cs.getConversions() / statistics.getClicks()) * 100;
                     double clicks = statistics.getClicks();
@@ -334,6 +371,7 @@ public class TaskResourceImpl implements TaskResource {
                     String rate = df.format((conversions / clicks) * 100);
                     statistics.setRate(new BigDecimal(rate));
 
+<<<<<<< HEAD
                     Map<String, Object> params = new HashMap();
                     params.put("appName", appName);
                     params.put("subChannel", subChannel);
@@ -345,13 +383,19 @@ public class TaskResourceImpl implements TaskResource {
 
                     LOGGER.debug(String.format("[TaskResourceImpl].[setStatisticsValue]---->[cost]:{}" + cost));
                     statistics.setCost(new BigDecimal(cost));
+=======
+                    statistics.setCost(cs.getCost());
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+<<<<<<< HEAD
 
         LOGGER.debug(String.format("[TaskResourceImpl].[setStatisticsValue]---->[statistics]:{}" + statistics.toString()));
+=======
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
         return statistics;
     }
 

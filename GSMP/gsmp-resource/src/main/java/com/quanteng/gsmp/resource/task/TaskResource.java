@@ -10,7 +10,10 @@
  */
 package com.quanteng.gsmp.resource.task;
 
+<<<<<<< HEAD
 import com.quanteng.gsmp.resource.task.request.CHReq;
+=======
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
 import com.quanteng.gsmp.resource.task.request.CSReq;
 
 import javax.ws.rs.POST;
@@ -37,6 +40,10 @@ public interface TaskResource {
     @POST
     @Path("/ch")
     @Produces(MediaType.APPLICATION_JSON)
+<<<<<<< HEAD
     void conversionHandle(CHReq req);
+=======
+    void conversionHandle(String opType);
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
 
 }

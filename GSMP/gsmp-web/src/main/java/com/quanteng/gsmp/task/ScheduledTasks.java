@@ -11,7 +11,10 @@
 package com.quanteng.gsmp.task;
 
 import com.quanteng.gsmp.resource.task.TaskResource;
+<<<<<<< HEAD
 import com.quanteng.gsmp.resource.task.request.CHReq;
+=======
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
 import com.quanteng.gsmp.resource.task.request.CSReq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +53,13 @@ public class ScheduledTasks {
     public void conversionHandleTask() {
         LOGGER.debug(String.format("[ScheduledTasks].[conversionHandle]---->[Begin]:{}" + datefaormat.format(new Date())));
         String opType = "0";
+<<<<<<< HEAD
         CHReq req = new CHReq();
         req.setOpType(opType);
         taskResource.conversionHandle(req);
+=======
+        taskResource.conversionHandle(opType);
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
         LOGGER.debug(String.format("[ScheduledTasks].[conversionHandle]---->[End]:{}" + datefaormat.format(new Date())));
     }
 

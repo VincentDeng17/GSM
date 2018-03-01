@@ -152,11 +152,28 @@
     </select>
 
     <select id="queryCS" parameterType="map" resultMap="ConversionStatisticsMap">
+<<<<<<< HEAD
         SELECT dimension, app_name, sub_channel, conversions, 0 AS cost
         FROM
         (
             SELECT
                 DATE_FORMAT(t.notify_time, '%Y-%m-%d') AS dimension, t.app_name, sub_channel, COUNT(DISTINCT t.link_id) AS conversions
+=======
+        SELECT dimension, app_name, sub_channel, conversions, conversions * price AS cost
+        FROM
+        (
+            SELECT
+                DATE_FORMAT(t.notify_time, '%Y-%m-%d') AS dimension, t.app_name, sub_channel, COUNT(DISTINCT t.link_id) AS conversions,
+                (
+                    SELECT
+                    a.price
+                    FROM
+                    T_APP_URL_MAPPING a
+                    WHERE
+                    a.app_name = t.app_name
+                    AND a.sub_channel = t.sub_channel
+                ) AS price
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
             FROM
               T_CONVERSION t
             WHERE t.notify_status = 0

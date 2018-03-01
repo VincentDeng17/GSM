@@ -121,7 +121,10 @@ public class Arith {
         String rate2 = df.format(conversions_d / clicks_d * 100);
         System.out.println("[rate2]:"+new BigDecimal(rate2));
 
+<<<<<<< HEAD
         System.out.println("================乘法============");
+=======
+>>>>>>> 7471c5ec7df3c08f281e3684a78bccf89b489c99
 
     }
 }
